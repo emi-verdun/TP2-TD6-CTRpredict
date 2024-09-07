@@ -29,6 +29,10 @@ gc.collect()
 cls = make_pipeline(SimpleImputer(), DecisionTreeClassifier(max_depth=8, random_state=2345))
 cls.fit(X_train, y_train)
 
+pred_on_val = cls.predict_proba(X_val)[:,1]
+auc_roc = roc_auc_score(y_val, pred_on_val)
+print(auc_roc)
+
 # Predict on the evaluation set
 eval_data = test_data.select_dtypes(include='number')
 y_preds = cls.predict_proba(eval_data.drop(columns=["id"]))[:, cls.classes_ == 1].squeeze()
@@ -37,4 +41,4 @@ y_preds = cls.predict_proba(eval_data.drop(columns=["id"]))[:, cls.classes_ == 1
 # Make the submission file
 submission_df = pd.DataFrame({"id": eval_data["id"], "Label": y_preds})
 submission_df["id"] = submission_df["id"].astype(int)
-submission_df.to_csv("basic_model.csv", sep=",", index=False)
+submission_df.to_csv("mas_train_model.csv", sep=",", index=False)
