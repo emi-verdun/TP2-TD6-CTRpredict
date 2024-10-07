@@ -174,7 +174,7 @@ plt.show()
 #     'learning_rate': [0.01, 0.05, 0.1, 0.2],
 #     'max_depth': [6, 8, 10, 12, 14, 16],
 #     'min_child_samples': [10, 20, 30, 40],
-#  
+#     'colsample_bytree': [0.7, 0.8, 0.9, 1.0],
 # }
 
 # cls = lgb.LGBMClassifier(boosting_type='dart', random_state=2345, is_unbalance=True)
