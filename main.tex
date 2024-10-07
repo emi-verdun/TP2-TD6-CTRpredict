@@ -97,7 +97,7 @@ Estas nuevas variables fueron diseñadas para capturar más información sobre e
 
 \section{Conjunto de Validación}
 
-Para armar el conjunto de validación, se utilizó la técnica de \textit{train-test split}, dividiendo los datos en un 80\% para entrenamiento y un 20\% para validación. Esta división se realizó de manera estratificada, manteniendo la proporción de la variable objetivo \textit{Label} (clicko no click) en ambos conjuntos, lo que asegura que ambos subconjuntos sean representativos de los datos originales.
+Para armar el conjunto de validación, se utilizó la técnica de \textit{train-test split}, dividiendo los datos en un 80\% para entrenamiento y un 20\% para validación.
 
 La proporción 80/20 fue seleccionada porque ofrece una cantidad suficiente de datos para entrenar el modelo, al mismo tiempo que permite evaluar su rendimiento en un conjunto de validación no visto durante el entrenamiento.
 
@@ -110,34 +110,19 @@ En este trabajo se utilizaron dos modelos principales de aprendizaje automático
 
 \subsection{XGBoost}
 
-El modelo XGBoost se seleccionó debido a su capacidad para manejar grandes volúmenes de datos y su buen rendimiento en problemas de clasificación binaria. Para optimizar los hiperparámetros, se realizó una búsqueda mediante el método de \textit{Randomized Search}, explorando los siguientes parámetros:
-
-\begin{itemize}
-    \item \textbf{max\_depth}: Profundidad máxima de los árboles.
-    \item \textbf{learning\_rate}: Tasa de aprendizaje.
-    \item \textbf{n\_estimators}: Número de árboles en el modelo.
-    \item \textbf{gamma}: Parámetro de regularización.
-    \item \textbf{subsample} y \textbf{colsample\_bytree}: Proporciones de muestreo.
-\end{itemize}
+El modelo XGBoost se seleccionó debido a su capacidad para manejar grandes volúmenes de datos y su buen rendimiento en problemas de clasificación binaria. Para optimizar los hiperparámetros, se realizó una búsqueda mediante el método de \textit{Randomized Search}, explorando los siguientes parámetros: max_depth, learning_rate, n_estimators, gamma, subsample y colsample_bytree.
 
 Esta búsqueda permitió probar diferentes combinaciones de estos parámetros, y tras múltiples iteraciones, se identificaron los hiperparámetros que ofrecieron el mejor rendimiento para este modelo.
 
 \subsection{LightGBM}
 
-El modelo LightGBM, por su parte, fue seleccionado debido a su eficiencia en términos de tiempo de entrenamiento y su capacidad para manejar grandes conjuntos de datos. A diferencia de XGBoost, en este caso se optó por realizar un ajuste manual de hiperparámetros basado en la experiencia previa y los resultados obtenidos durante el proceso de validación. Entre los parámetros ajustados destacan:
-
-\begin{itemize}
-    \item \textbf{n\_estimators}: Número de árboles.
-    \item \textbf{max\_depth}: Profundidad máxima de los árboles.
-    \item \textbf{learning\_rate}: Tasa de aprendizaje.
-    \item \textbf{boosting\_type}: Tipo de boosting utilizado (se seleccionó \textit{dart}).
-\end{itemize}
+El modelo LightGBM, por su parte, fue seleccionado debido a su eficiencia en términos de tiempo de entrenamiento y su capacidad para manejar grandes conjuntos de datos. A diferencia de XGBoost, en este caso se optó por realizar un ajuste manual de hiperparámetros basado en la experiencia previa y los resultados obtenidos durante el proceso de validación. Entre los parámetros ajustados destacan: n_estimators, max_depth, learning_rate y boosting type.
 
 Este ajuste permitió optimizar el rendimiento del modelo LightGBM de manera eficiente, resultando en una mejor capacidad predictiva en comparación con XGBoost.
 
 \subsubsection{Comparación de Rendimientos}
 
-Tras realizar las pruebas con ambos modelos, \textbf{LightGBM} fue el que obtuvo los mejores resultados en términos de AUC (Area Under the Curve), lo que lo convirtió en el modelo final seleccionado. Aunque XGBoost también mostró un buen rendimiento, LightGBM se destacó por su velocidad y eficiencia en el manejo del conjunto de datos, así como por su capacidad predictiva superior.
+Tras realizar las pruebas con ambos modelos, \textbf{LightGBM} fue el que obtuvo los mejores resultados en términos de AUC, lo que lo convirtió en el modelo final seleccionado. Aunque XGBoost también mostró un buen rendimiento, LightGBM se destacó por su velocidad y eficiencia en el manejo del conjunto de datos, además este modelo tiene la capacidad de manejar variables categóricas cosa para lo cual xgboost necesita transformaciones, como one-hot encoding, que al ser tan grande el conjunto de datos tardaban demasiado tiempo. 
 
 
     
