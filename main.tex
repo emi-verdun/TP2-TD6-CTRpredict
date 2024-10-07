@@ -85,6 +85,8 @@ Durante el análisis, se crearon varias variables adicionales con el fin de mejo
 
 \begin{itemize}
     \item \textbf{Interacción entre \textit{auction\_bidfloor} y \textit{auction\_age}}: Se generó la variable \textit{bidfloor\_age\_interaction}, que representa el producto entre el valor mínimo de oferta en una subasta (\textit{auction\_bidfloor}) y la edad del usuario al momento de la subasta (\textit{auction\_age}). La idea detrás de esta interacción es capturar posibles efectos conjuntos entre el costo de los anuncios y la edad del usuario en la probabilidad de hacer click.
+
+    \item \textbf{Cuadrado de la altura del anuncio (\textit{creative\_height\_squared})}: Se generó una nueva variable a partir de elevar al cuadrado la altura original del anuncio (\textit{creative\_height}). Esto permite capturar posibles relaciones no lineales entre el tamaño del anuncio y la probabilidad de que un usuario haga click.
     
     \item \textbf{Hora del día (\textit{hour})}: A partir de la variable \textit{auction\_time}, que representa el momento exacto en que ocurrió la subasta, se extrajo la hora del día. Esto nos permite analizar patrones de comportamiento de los usuarios en función de las horas del día, ya que la actividad de los usuarios puede variar considerablemente a lo largo del día.
     
