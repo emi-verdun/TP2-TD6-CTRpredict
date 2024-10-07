@@ -1,4 +1,6 @@
-\documentclass[a4paper,11pt]{article}
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{microtype}
 \usepackage{graphicx}
 \usepackage{float}
 
@@ -84,7 +86,7 @@ Para identificar las variables más relevantes para predecir los clicks, se calc
 Durante el análisis, se crearon varias variables adicionales con el fin de mejorar la capacidad predictiva del modelo. A continuación, se describen las principales:
 
 \begin{itemize}
-    \item \textbf{Interacción entre \textit{auction\_bidfloor} y \textit{auction\_age}}: Se generó la variable \textit{bidfloor\_age\_interaction}, que representa el producto entre el valor mínimo de oferta en una subasta (\textit{auction\_bidfloor}) y la edad del usuario al momento de la subasta (\textit{auction\_age}). La idea detrás de esta interacción es capturar posibles efectos conjuntos entre el costo de los anuncios y la edad del usuario en la probabilidad de hacer click.
+    \item \textbf{Interacción entre \textit{auction\_bidfloor} y \textit{auction\_age}}: Se generó la variable \textit{bidfloor\_age\_\hspace{0pt}interaction}, que representa el producto entre el valor mínimo de oferta en una subasta (\textit{auction\_bidfloor}) y la edad del usuario al momento de la subasta (\textit{auction\_age}). La idea detrás de esta interacción es capturar posibles efectos conjuntos entre el costo de los anuncios y la edad del usuario en la probabilidad de hacer click.
 
     \item \textbf{Cuadrado de la altura del anuncio (\textit{creative\_height\_squared})}: Se generó una nueva variable a partir de elevar al cuadrado la altura original del anuncio (\textit{creative\_height}). Esto permite capturar posibles relaciones no lineales entre el tamaño del anuncio y la probabilidad de que un usuario haga click.
     
@@ -112,13 +114,13 @@ En este trabajo se utilizaron dos modelos principales de aprendizaje automático
 
 \subsection{XGBoost}
 
-El modelo XGBoost se seleccionó debido a su capacidad para manejar grandes volúmenes de datos y su buen rendimiento en problemas de clasificación binaria. Para optimizar los hiperparámetros, se realizó una búsqueda mediante el método de \textit{Randomized Search}, explorando los siguientes parámetros: max_depth, learning_rate, n_estimators, gamma, subsample y colsample_bytree.
+El modelo XGBoost se seleccionó debido a su capacidad para manejar grandes volúmenes de datos y su buen rendimiento en problemas de clasificación binaria. Para optimizar los hiperparámetros, se realizó una búsqueda mediante el método de \textit{Randomized Search}, explorando los siguientes parámetros: \texttt{max\_depth}, \texttt{learning\_rate}, \texttt{n\_estimators}, \texttt{gamma}, \texttt{subsample} y \texttt{colsample\_bytree}.
 
 Esta búsqueda permitió probar diferentes combinaciones de estos parámetros, y tras múltiples iteraciones, se identificaron los hiperparámetros que ofrecieron el mejor rendimiento para este modelo.
 
 \subsection{LightGBM}
 
-El modelo LightGBM, por su parte, fue seleccionado debido a su eficiencia en términos de tiempo de entrenamiento y su capacidad para manejar grandes conjuntos de datos. A diferencia de XGBoost, en este caso se optó por realizar un ajuste manual de hiperparámetros basado en la experiencia previa y los resultados obtenidos durante el proceso de validación. Entre los parámetros ajustados destacan: n_estimators, max_depth, learning_rate y boosting type.
+El modelo LightGBM, por su parte, fue seleccionado debido a su eficiencia en términos de tiempo de entrenamiento y su capacidad para manejar grandes conjuntos de datos. A diferencia de XGBoost, en este caso se optó por realizar un ajuste manual de hiperparámetros basado en la experiencia previa y los resultados obtenidos durante el proceso de validación. Entre los parámetros ajustados destacan: \texttt{n\_estimators}, \texttt{max\_depth}, \texttt{learning\_rate} y \texttt{boosting type}.
 
 Este ajuste permitió optimizar el rendimiento del modelo LightGBM de manera eficiente, resultando en una mejor capacidad predictiva en comparación con XGBoost.
 
@@ -130,7 +132,7 @@ Tras realizar las pruebas con ambos modelos, \textbf{LightGBM} fue el que obtuvo
     
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{importancia_modelo.png}
+    \includegraphics[width=0.5\textwidth]{graficos/importancia_modelo.png}
     \caption{Atributos más importantes \textit{Label}.}
 \end{figure}
 
@@ -139,4 +141,3 @@ En nuestro modelo final, el que usa LightGBM, se ve que en las variables con má
 
 
 \end{document}
-
