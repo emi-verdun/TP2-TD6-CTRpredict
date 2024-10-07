@@ -8,13 +8,14 @@ from sklearn.metrics import roc_auc_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
-# Print all columns and rows
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 pd.set_option('display.width', None)
 
-# Load part of the train data
+
+## Cargamos los datos
+
+# Cargar datos para entrenamiento
 ctr15 = pd.read_csv("ctr_15.csv")
 ctr16 = pd.read_csv("ctr_16.csv")
 ctr17 = pd.read_csv("ctr_17.csv")
@@ -24,15 +25,17 @@ ctr20 = pd.read_csv("ctr_20.csv")
 ctr21 = pd.read_csv("ctr_21.csv")
 train_data = pd.concat([ctr21, ctr20, ctr19, ctr18, ctr17, ctr16, ctr15], ignore_index=True)
 
-# Load the test data
+# Cargar datos para test
 test = pd.read_csv("ctr_test.csv")
 test_data = test.drop(columns=["id"])
 
-# Train a tree on the train data
+# Separo Label de los demás atributos
 train_data = train_data.sample(frac=7/7, random_state=2345)
 y = train_data["Label"]
 x = train_data.drop(columns=["Label"])
 
+
+## Preprocesamiento
 
 # Convertir variables categóricas al tipo adecuado
 categorical_columns = [col for col in x.columns if 'categorical' in col]
@@ -54,7 +57,7 @@ categorical_columns_test = [col for col in test_data.columns if 'categorical' in
 for col in categorical_columns_test:
     test_data[col] = test_data[col].astype('category')
 
-# Procesar timestamp (auction_time)
+# Procesar timestamp (auction_time) para test_data
 test_data['auction_time'] = pd.to_datetime(test_data['auction_time'], unit='s')
 test_data['hour'] = test_data['auction_time'].dt.hour
 test_data['day_of_week'] = test_data['auction_time'].dt.dayofweek
@@ -64,26 +67,30 @@ test_data = test_data.drop(columns=['auction_time'])
 # Crear interacción de características en test_data
 test_data['bidfloor_age_interaction'] = test_data['auction_bidfloor'] * test_data['auction_age']
 
-
-# Eliminar variables no numéricas excepto las categóricas
+# Utilizamos solo las columnas numéricas y categóricas
 x = x.select_dtypes(include=['number', 'category'])
 test_data = test_data.select_dtypes(include=['number', 'category'])
 
 
-
+# Separación de un conjunto de validación
 X_train, X_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_state=2345)
 
 
+## Visualizaciones Análisis Exploratorio
+
 #Figura 1
+#Distribución de impresiones por hora del día
 train_data['auction_time'] = pd.to_datetime(train_data['auction_time'], unit='s')
 train_data['hour'] = train_data['auction_time'].dt.hour
 sns.countplot(x='hour', data=train_data)
+plt.subplots_adjust(left=0.2, right=0.8, top=0.9, bottom=0.2)
 plt.title('Distribución de impresiones por hora del día')
 plt.xlabel('Hora del día')
 plt.ylabel('Cantidad de impresiones')
 plt.show()
 
 #Figura 2
+#Cantidad de clics (Label=1) por hora del día
 train_data_label_1 = train_data[train_data['Label'] == 1]
 
 
@@ -94,41 +101,39 @@ plt.ylabel('Cantidad de clics')
 plt.show()
 
 
+#Eliminamos el conjunto de train sin separar
 del train_data
 gc.collect()
 
 
+## Preprocesamiento (luego de separar conjunto de validación y entrenamiento)
 
 # Identificar columnas numéricas
 numeric_columns = X_train.select_dtypes(include=['float64', 'int32']).columns
 
-# Crear imputers separados para variables numéricas y categóricas
-#imputer_num = SimpleImputer(strategy='median')
+# Crear imputers para variables categóricas (no imputamos numéricas porque el modelo no mostraba mejoras significativas)
 imputer_cat = SimpleImputer(strategy='most_frequent')
 
 # Imputar valores faltantes para el conjunto de entrenamiento
-#X_train[numeric_columns] = imputer_num.fit_transform(X_train[numeric_columns])
 for col in categorical_columns:
     if X_train[col].isnull().sum() > 0:
         X_train[col] = X_train[col].cat.add_categories('Missing')  # Agregar 'Missing' como categoría
         X_train[col] = X_train[col].fillna('Missing')  # Rellenar con 'Missing'
 
 # Imputar valores faltantes para el conjunto de validación
-#X_val[numeric_columns] = imputer_num.transform(X_val[numeric_columns])  # Usar el mismo imputador
 for col in categorical_columns:
     if X_val[col].isnull().sum() > 0:
-        X_val[col] = X_val[col].cat.add_categories('Missing')  # Asegurarse de que la categoría 'Missing' exista
+        X_val[col] = X_val[col].cat.add_categories('Missing')  # Agregar 'Missing' como categoría
         X_val[col] = X_val[col].fillna('Missing')  # Rellenar con 'Missing'
 
-#numeric_columns = test_data.select_dtypes(include=['float64', 'int32']).columns
 # Imputar valores faltantes para el conjunto de prueba
-#test_data[numeric_columns] = imputer_num.transform(test_data[numeric_columns])  # Usar el mismo imputador
 for col in categorical_columns:
     if test_data[col].isnull().sum() > 0:
-        test_data[col] = test_data[col].cat.add_categories('Missing')  # Asegurarse de que la categoría 'Missing' exista
+        test_data[col] = test_data[col].cat.add_categories('Missing')  # Agregar 'Missing' como categoría
         test_data[col] = test_data[col].fillna('Missing')  # Rellenar con 'Missing'
 
 
+#Trasformación de creative_height en los 3 conjuntos de datos
 if not(X_train['creative_height'].empty):
     X_train['creative_height_squared'] = X_train['creative_height'] ** 2
 
@@ -139,27 +144,31 @@ if not(test_data['creative_height'].empty):
     test_data['creative_height_squared'] = test_data['creative_height'] ** 2
 
 
+## Visualizaciones Análisis Exploratorio
+
+#Figura 3
+#Correlación de Variables con y_train
+
 data_with_labels = pd.concat([X_train, y_train], axis=1)
 
-# Calcular la correlación de Pearson entre las características y y_train
+# Calcular la correlación de Pearson entre las características e y_train
 numerical_data = data_with_labels.select_dtypes(include=['float64', 'int64'])
 correlations = numerical_data.corr()['Label'].drop('Label')  # Excluir la autocorrelación de 'Label'
 
 # Ordenar las correlaciones de mayor a menor
 correlations_sorted = correlations.abs().sort_values(ascending=False)
 
-# Imprimir las correlaciones
-print(correlations_sorted)
-
 # Graficar las correlaciones
 plt.figure(figsize=(10, 8))
 correlations_sorted.plot(kind='bar')
+plt.subplots_adjust(left=0.2, right=0.8, top=0.9, bottom=0.2)
 plt.title('Correlación de Variables con y_train')
 plt.xlabel('Variables')
 plt.ylabel('Coeficiente de Correlación de Pearson')
 plt.show()
 
 
+## Entrenar modelo
 cls = lgb.LGBMClassifier(n_estimators=200, 
                                        max_depth=14, 
                                        learning_rate=0.01, 
@@ -168,26 +177,31 @@ cls = lgb.LGBMClassifier(n_estimators=200,
                                        is_unbalance=True)
 cls.fit(X_train, y_train)
 
-
+#Predecimos sobre validación y vemos auc_roc
 pred_on_val = cls.predict_proba(X_val)[:,1]
 auc_roc = roc_auc_score(y_val, pred_on_val)
 print(auc_roc)
 
+## Atributos más significativos
+#Figura 4
 importancia = cls.feature_importances_
 
+# Armamos un dataframe con las variables y su importacia
 importancia_df = pd.DataFrame({
-    'Característica': X_train.columns,
+    'Variables': X_train.columns,
     'Importancia': importancia
-}).sort_values(by='Importancia', ascending=False)
+}).sort_values(by='Importancia', ascending=False) #Ordenamos la importancia de mayor a menor
 
+# Nos quedamos con las 10 variables más importantes
 top_10 = importancia_df.head(10)
 
+# Graficamos
 plt.figure(figsize=(10, 6))
-plt.barh(top_10['Característica'], top_10['Importancia'], color='skyblue')
+plt.barh(top_10['Variables'], top_10['Importancia'], color='skyblue')
 plt.xlabel('Importancia')
-plt.ylabel('Características')
-plt.title('Top 10 Características más Importantes')
-plt.gca().invert_yaxis()  # Invertir el eje para que la más importante esté arriba
+plt.ylabel('Variables')
+plt.title('Top 10 Variables más Importantes')
+plt.gca().invert_yaxis() 
 plt.show()
 
 

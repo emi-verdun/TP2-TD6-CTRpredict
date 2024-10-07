@@ -126,11 +126,15 @@ Este ajuste permitió optimizar el rendimiento del modelo LightGBM de manera efi
 
 Tras realizar las pruebas con ambos modelos, \textbf{LightGBM} fue el que obtuvo los mejores resultados en términos de AUC, lo que lo convirtió en el modelo final seleccionado. Aunque XGBoost también mostró un buen rendimiento, LightGBM se destacó por su velocidad y eficiencia en el manejo del conjunto de datos, además este modelo tiene la capacidad de manejar variables categóricas cosa para lo cual xgboost necesita transformaciones, como one-hot encoding, que al ser tan grande el conjunto de datos tardaban demasiado tiempo. 
 
-
+\section{Importancia de Atributos en el Modelo Final}
     
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{correlaciones_modelo.png}
+    \caption{Atributos más importantes \textit{Label}.}
+\end{figure}
 
-
-
+En nuestro modelo final, el que usa LightGBM, se ve que en las variables con más importancia la mayoría son justamente las variables categóricas.
 
 
 
