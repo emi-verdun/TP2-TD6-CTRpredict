@@ -2,8 +2,7 @@ import pandas as pd
 import gc
 from sklearn.impute import SimpleImputer
 import lightgbm as lgb
-from sklearn.pipeline import make_pipeline
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.metrics import roc_auc_score
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -168,10 +167,41 @@ plt.ylabel('Coeficiente de Correlación de Pearson')
 plt.show()
 
 
-## Entrenar modelo
+## Optimización de parámetros
+# TOMA MUCHÍSIMO TIEMPO -> MEJOR RESULTADO DIRECTAMENTE PUESTO COMO PARAMETROS LUEGO
+# param_dist = {
+#     'n_estimators': [100, 200, 300, 400, 500],
+#     'learning_rate': [0.01, 0.05, 0.1, 0.2],
+#     'max_depth': [6, 8, 10, 12, 14, 16],
+#     'min_child_samples': [10, 20, 30, 40],
+#  
+# }
+
+# cls = lgb.LGBMClassifier(boosting_type='dart', random_state=2345, is_unbalance=True)
+
+# random_search = RandomizedSearchCV(
+#     estimator=cls,
+#     param_distributions=param_dist,
+#     n_iter=10, 
+#     scoring='roc_auc',
+#     cv=3,  
+#     verbose=1,
+#     random_state=2345,
+#     n_jobs=-1
+# )
+
+# random_search.fit(X_train, y_train)
+# print("Best Parameters: ", random_search.best_params_)
+# print("Best AUC-ROC Score: ", random_search.best_score_)
+
+
+
+## Entrenar modelo optimizado con parámetros obtenidos con random search
 cls = lgb.LGBMClassifier(n_estimators=200, 
                                        max_depth=14, 
-                                       learning_rate=0.01, 
+                                       learning_rate=0.01,
+                                       min_child_samples=10,
+                                       colsample_bytree=1.0,
                                        boosting_type='dart', 
                                        random_state=2345,
                                        is_unbalance=True)
@@ -181,6 +211,7 @@ cls.fit(X_train, y_train)
 pred_on_val = cls.predict_proba(X_val)[:,1]
 auc_roc = roc_auc_score(y_val, pred_on_val)
 print(auc_roc)
+
 
 ## Atributos más significativos
 #Figura 4

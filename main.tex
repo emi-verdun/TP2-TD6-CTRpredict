@@ -73,12 +73,12 @@ La hora del día en que ocurre la subasta puede influir en el comportamiento del
 
 \subsubsection{Correlación de Pearson entre las Variables y \textit{Label}}
 
-Para identificar las variables más relevantes para predecir los clicks, se calculó el coeficiente de correlación de Pearson entre las principales variables numéricas y la variable \textit{Label}. En el siguiente gráfico se muestran las 8 variables con mayor correlación.
+Para identificar las variables numéricas que parecen estar más relacionadas con los clicks, se calculó el coeficiente de correlación de Pearson entre las principales variables numéricas y la variable \textit{Label}. En el siguiente gráfico se muestran las 8 variables con mayor correlación.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{graficos/pearson.png}
-    \caption{Correlación de Pearson de las variables con \textit{Label}.}
+    \caption{Correlación de Pearson de las variables numéricas con \textit{Label}.}
 \end{figure}
 
 \section{Creación de Variables Adicionales}
@@ -103,7 +103,7 @@ Estas nuevas variables fueron diseñadas para capturar más información sobre e
 
 Para armar el conjunto de validación, se utilizó la técnica de \textit{train-test split}, dividiendo los datos en un 80\% para entrenamiento y un 20\% para validación.
 
-La proporción 80/20 fue seleccionada porque ofrece una cantidad suficiente de datos para entrenar el modelo, al mismo tiempo que permite evaluar su rendimiento en un conjunto de validación no visto durante el entrenamiento.
+La proporción 80/20 fue seleccionada porque ofrece una cantidad suficiente de datos para entrenar el modelo, al mismo tiempo que permite evaluar su rendimiento en un conjunto de validación no visto durante el entrenamiento. La cantidad de observaciones de validación con esta proporción es similar a la vez con la cantidad de observaciones del conjunto de testing.
 
 En resumen, esta estrategia de validación asegura que el modelo se entrene de manera adecuada y se evalúe su rendimiento antes de realizar predicciones sobre el conjunto de prueba final.
 
@@ -120,13 +120,13 @@ Esta búsqueda permitió probar diferentes combinaciones de estos parámetros, y
 
 \subsection{LightGBM}
 
-El modelo LightGBM, por su parte, fue seleccionado debido a su eficiencia en términos de tiempo de entrenamiento y su capacidad para manejar grandes conjuntos de datos. A diferencia de XGBoost, en este caso se optó por realizar un ajuste manual de hiperparámetros basado en la experiencia previa y los resultados obtenidos durante el proceso de validación. Entre los parámetros ajustados destacan: \texttt{n\_estimators}, \texttt{max\_depth}, \texttt{learning\_rate} y \texttt{boosting type}.
+El modelo LightGBM, por su parte, fue seleccionado debido a su eficiencia en términos de tiempo de entrenamiento, su capacidad de trabajar con categóricas y su capacidad para manejar grandes conjuntos de datos. En este caso también se realizó un \textit{Randomized Search} de los siguientes hiperparámetros: \texttt{max\_depth}, \texttt{learning\_rate}, \texttt{n\_estimators}, \texttt{min\_child\_sample} y \texttt{colsample\_bytree}. Si bien está búsqueda fue lo más costoso temporalmente, su realización permitió llegar a muy buenos resultados y fue más eficiente que la realizada con XGBoost. Se eligió nuevamente Random Search, con 10 combinaciones posibles, porque realizar Grid Search era muy costoso en términos de tiempo.
 
 Este ajuste permitió optimizar el rendimiento del modelo LightGBM de manera eficiente, resultando en una mejor capacidad predictiva en comparación con XGBoost.
 
 \subsubsection{Comparación de Rendimientos}
 
-Tras realizar las pruebas con ambos modelos, \textbf{LightGBM} fue el que obtuvo los mejores resultados en términos de AUC, lo que lo convirtió en el modelo final seleccionado. Aunque XGBoost también mostró un buen rendimiento, LightGBM se destacó por su velocidad y eficiencia en el manejo del conjunto de datos, además este modelo tiene la capacidad de manejar variables categóricas cosa para lo cual xgboost necesita transformaciones, como one-hot encoding, que al ser tan grande el conjunto de datos tardaban demasiado tiempo. 
+Tras realizar las pruebas con ambos modelos, \textbf{LightGBM} fue el que obtuvo los mejores resultados en términos de AUC (0.827, no contado en el leaderboard porque fue subido a las 23:59 del jueves 3), lo que lo convirtió en el modelo final seleccionado. Aunque XGBoost también mostró un buen rendimiento (0.79), LightGBM se destacó por su velocidad y eficiencia en el manejo del conjunto de datos, además este modelo tiene la capacidad de manejar variables categóricas cosa para lo cual xgboost necesita transformaciones, como one-hot encoding, que al ser tan grande el conjunto de datos tardaban demasiado tiempo. 
 
 \section{Importancia de Atributos en el Modelo Final}
     
